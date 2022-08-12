@@ -31,34 +31,48 @@ public class PlayerMovement : MonoBehaviour
     private LayerMask ground;
     [SerializeField]
     private Transform playerPos;
+
+    private bool ragdoll;
     
 
     void Start()
     {
+        ragdoll = false;
         leftLegRB = leftLeg.GetComponent<Rigidbody2D>();
         rightLegRB = rightLeg.GetComponent<Rigidbody2D>();
     }
 
     void Update()
     {
-        if(Input.GetAxisRaw("Horizontal") != 0){
-            if(Input.GetAxisRaw("Horizontal") > 0){
-                anim.Play("Walk_Right");
-                StartCoroutine(MoveRight(stepWait));
+        if(!ragdoll){
+            if(Input.GetAxisRaw("Horizontal") != 0){
+                if(Input.GetAxisRaw("Horizontal") > 0){
+                    anim.Play("Walk_Right");
+                    StartCoroutine(MoveRight(stepWait));
+                }
+                else{
+                    anim.Play("Walk_Left");
+                    StartCoroutine(MoveLeft(stepWait));
+                }
             }
             else{
-                anim.Play("Walk_Left");
-                StartCoroutine(MoveLeft(stepWait));
+                anim.Play("Idle");
+            }
+
+            isOnGround = Physics2D.OverlapCircle(playerPos.position, positionRadius, ground);
+            if(isOnGround && Input.GetKeyDown(KeyCode.Space)){
+                rb.AddForce(Vector2.up * jumpForce);
             }
         }
-        else{
-            anim.Play("Idle");
+        
+        if(Input.GetKeyDown(KeyCode.F)){
+            ragdoll = !ragdoll;
         }
 
-        isOnGround = Physics2D.OverlapCircle(playerPos.position, positionRadius, ground);
-        if(isOnGround && Input.GetKeyDown(KeyCode.Space)){
-            rb.AddForce(Vector2.up * jumpForce);
+        for(int i = 0; i < 6; i++){
+            transform.GetChild(i).GetComponent<PlayerBalance>().enabled = !ragdoll;
         }
+
     }
 
     IEnumerator MoveRight(float seconds){
