@@ -27,12 +27,12 @@ public class CreateAndJoinRooms : MonoBehaviourPunCallbacks
         PhotonNetwork.CreateRoom(createServerText);
     }
 
-    public void JoinRoom(){
-
+    public void JoinRoom(TMP_Text _name){
+        PhotonNetwork.JoinRoom(_name.text);
     }
 
     public override void OnJoinedRoom(){
-        PhotonNetwork.LoadLevel("MainGame");
+        PhotonNetwork.LoadLevel("GameLobby");
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList){
